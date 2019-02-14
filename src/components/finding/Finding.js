@@ -7,21 +7,29 @@ import Findgroup from "../findgroup/Findgroup";
 import Banner1 from "./banner1.jpg";
 import Banner2 from "./banner2.jpg";
 import Banner3 from "./banner3.jpg";
+import asynList from "../../store/actions/asynList";
+import * as types from "../../store/types";
+import {connect} from "react-redux";
 class Finding extends Component{
-    state={
-        msg2:[]
-    };
-    componentDidMount() {
-        fetch(
-            `/data/find.data`
-        ).then(
-            res=>res.json()
-        ).then(
-            data=>this.setState({msg2:data})
-        )
+    constructor(props){
+        super()
+        props.get()
     }
+    // state={
+    //     msg2:[]
+    // };
+    // componentDidMount() {
+    //     fetch(
+    //         `/data/find.data`
+    //     ).then(
+    //         res=>res.json()
+    //     ).then(
+    //         data=>this.setState({msg2:data})
+    //     )
+    // }
 
     render() {
+        let {finding}=this.props
         return(
 
             <section className="zyw-container">
@@ -39,11 +47,29 @@ class Finding extends Component{
                     <div><img src={Banner2} alt=""/></div>
                     <div><img src={Banner3} alt=""/></div>
                 </ReactSwipe>
-                <Findgroup msg2={this.state.msg2} dataName="find"></Findgroup>
+                <Findgroup msg2={finding} dataName="find"></Findgroup>
             </section>
 
         )
     }
 }
 
-export default Finding
+const initMapStateToProps=state=>{
+    return(
+        {
+            finding:state.finding
+        }
+    )
+}
+const initMapDispatchToProps = dispatch=>{
+    return({
+        get:()=>dispatch(asynList({
+            url:"/data/find.data",
+            type:types.UPDATE_FINDING
+        })),
+    })
+}
+export default connect(
+    initMapStateToProps,
+    initMapDispatchToProps
+)(Finding)

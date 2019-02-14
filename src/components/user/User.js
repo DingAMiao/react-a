@@ -1,5 +1,6 @@
 import React,{Component} from 'react';
 import "./User.css";
+import {connect} from "react-redux";
 import mylogo from "../../assets/img/mylogo.png"
 import homecog from "../../assets/img/svg/home-cog.svg"
 import homeMessage from "../../assets/img/svg/home-message.svg"
@@ -20,7 +21,7 @@ class User extends Component{
                 <div className="home-head white-bgcolor clearfix">
                     <div className="head-img">
                         <div className="head-logo"><img src={mylogo} alt=""/></div>
-                        <div className="head-name">抓耗子的猫</div>
+                        <div className="head-name">{this.props.username}</div>
                         <div className="head-icon">
                             <a href="##"><img src={homecog} alt=""/></a>
                             <a href="##"><img src={homeMessage} alt=""/></a>
@@ -115,4 +116,14 @@ class User extends Component{
     }
 }
 
-export default User
+const initMapStateToProps=state=>({
+    username:state.user.data.username
+});
+const initMapDispatchToProps=dispatch=>({
+});
+
+
+export default connect(
+    initMapStateToProps,
+    initMapDispatchToProps
+)(User);

@@ -2,27 +2,32 @@ import React,{Component} from 'react';
 import "./Item.css";
 import Itemheader from "../../components/itemheader/Itemheader";
 import Itemfoot from "../../components/itemfoot/Itemfoot";
-import querystring from 'query-string'
+import querystring from 'query-string';
+import asynList from "../../store/actions/asynList";
+import * as types from "../../store/types";
+import {connect} from "react-redux";
 
 class Item extends Component{
-    state={
-        msg:{}
-    };
+    // state={
+    //     msg:{}
+    // };
     componentDidMount() {
         let id=this.props.match.params.id-0;
         let dataName=querystring.parse(this.props.location.search).dataName;
-        fetch(
-            `/data/${dataName}.data`
-        ).then(
-            res => res.json()
-        ).then(
-            data => this.setState({
-                msg:data[id-1]
-            })
-        )
+        this.props.get(id,dataName)
+        // fetch(
+        //     `/data/${dataName}.data`
+        // ).then(
+        //     res => res.json()
+        // ).then(
+        //     data => this.setState({
+        //         msg:data[id-1]
+        //     })
+        // )
     }
 
     render() {
+        let {item}=this.props.item;
         return(
             <div>
                 <Itemheader></Itemheader>
@@ -31,7 +36,7 @@ class Item extends Component{
                     <div className="item-img">
                         <div className="swiper-wrapper">
                             <div className="swiper-slide"><img
-                                src={this.state.msg.smallImage}
+                                src={this.props.item.smallImage}
                                 alt=""/></div>
                             <div className="swiper-slide"><img
                                 src="https://m.360buyimg.com/n12/jfs/t13438/360/124743365/49464/474ae43b/5a03ffaeNeb7db52b.jpg!q70.jpg"
@@ -50,9 +55,9 @@ class Item extends Component{
                         <div className="swiper-pagination"></div>
                     </div>
                     <div className="item-details white-bgcolor clearfix">
-                        <h3 className="details-title">{this.state.msg.productName}</h3>
-                        <strong className="details-prince theme-color pull-left">￥{this.state.msg.vipshopPrice}</strong>
-                        <span className="details-volume pull-right">月销：{this.state.msg.newCatId}件</span>
+                        <h3 className="details-title">{this.props.item.productName}</h3>
+                        <strong className="details-prince theme-color pull-left">￥{this.props.item.vipshopPrice}</strong>
+                        <span className="details-volume pull-right">月销：{this.props.item.newCatId}件</span>
                     </div>
                     <div className="item-choose weui-cells mt-625">
                         <a className="weui-cell weui-cell_access open-popup" href="javascript:;"
@@ -184,13 +189,13 @@ class Item extends Component{
                         <h4>图文详情</h4>
                         <span>
             <img
-                src={this.state.msg.smallImage}
+                src={this.props.item.smallImage}
                 alt=""/>
             <img
-                src={this.state.msg.image3}
+                src={this.props.item.image3}
                 alt=""/>
             <img
-                src={this.state.msg.image7}
+                src={this.props.item.image7}
                 alt=""/>
             <br/>
                     </span>
@@ -202,4 +207,24 @@ class Item extends Component{
     }
 }
 
-export default Item
+const initMapStateToProps=state=>{
+    return(
+        {
+            item:state.item
+        }
+    )
+}
+const initMapDispatchToProps = dispatch=>{
+
+    return({
+        get:(id,dataName)=>dispatch(asynList({
+            url:`/data/${dataName}.data`,
+            type:types.UPDATE_ITEM,
+            id:id
+        })),
+    })
+}
+export default connect(
+    initMapStateToProps,
+    initMapDispatchToProps
+)(Item)
